@@ -95,3 +95,29 @@ export async function loginUser(username, password) {
     throw new Error("Failed to login.");
   }
 }
+
+// 노트 삭제 함수
+export async function deleteNote(note_id) {
+  try {
+    // 먼저 Content를 삭제한 뒤 Note를 삭제 (외래 키 관계 때문)
+    const note = await db.note.findUnique({
+      where: { id: parseInt(note_id) },
+    });
+
+    if (!note) throw new Error("Note not found");
+
+    await db.content.delete({
+      where: { id: note.contentId },
+    });
+
+    await db.note.delete({
+      where: { id: parseInt(note_id) },
+    });
+
+    return { success: true };
+  } catch (error) {
+    console.error("Failed to delete note:", error);
+    throw new Error("Failed to delete note.");
+  }
+}
+

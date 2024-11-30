@@ -3,13 +3,27 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { useState, useEffect } from 'react';
-import { createNote, currentNotes } from '@/action';
+import { createNote, currentNotes, deleteNote } from '@/action';
 
-export default function Sidebar({ notes }) {
+export default function Sidebar({ notes, setNotes }) {
+
+  const handleDeleteNote = async (id) => {
+    try {
+      // 노트 삭제 요청
+      await deleteNote(id);
+
+      // 삭제 후 notes 상태 업데이트
+      setNotes((prevNotes) => prevNotes.filter((note) => note.id !== id));
+    } catch (error) {
+      console.error("Failed to delete note:", error);
+      alert("Failed to delete note.");
+    }
+  };
+
   const handleCreateNote = async () => {
     try {
       const newNote = await createNote(notes.length);
-      location.reload()  //새로고침
+      setNotes((prevNotes) => [...prevNotes, newNote]);
     } catch (error) {
       console.error(error);
       alert('Failed to create a note.');
@@ -65,16 +79,34 @@ export default function Sidebar({ notes }) {
       <div className="mt-8">
         <div className="px-4 text-xs font-semibold text-gray-500 mb-2 -ml-4">Private</div>
         {notes.map((note) => (
-          <Link
-            key={note.id}
-            href={`/note/${note.id}`}
-            className="flex items-center py-2 px-4 mb-2 text-sm font-semibold text-gray-700 rounded-md cursor-pointer hover:bg-gray-100"
-          >
-            <svg viewBox="0 0 20 20" className="w-5 h-5 mr-3 text-gray-600">
-              <path d="M4.35645 15.4678H11.6367C13.0996 15.4678 13.8584 14.6953 13.8584 13.2256V7.02539C13.8584 6.0752 13.7354 5.6377 13.1406 5.03613L9.55176 1.38574C8.97754 0.804688 8.50586 0.667969 7.65137 0.667969H4.35645C2.89355 0.667969 2.13477 1.44043 2.13477 2.91016V13.2256C2.13477 14.7021 2.89355 15.4678 4.35645 15.4678ZM4.46582 14.1279C3.80273 14.1279 3.47461 13.7793 3.47461 13.1436V2.99219C3.47461 2.36328 3.80273 2.00781 4.46582 2.00781H7.37793V5.75391C7.37793 6.73145 7.86328 7.20312 8.83398 7.20312H12.5186V13.1436C12.5186 13.7793 12.1836 14.1279 11.5205 14.1279H4.46582ZM8.95703 6.02734C8.67676 6.02734 8.56055 5.9043 8.56055 5.62402V2.19238L12.334 6.02734H8.95703ZM10.4336 9.00098H5.42969C5.16992 9.00098 4.98535 9.19238 4.98535 9.43164C4.98535 9.67773 5.16992 9.86914 5.42969 9.86914H10.4336C10.6797 9.86914 10.8643 9.67773 10.8643 9.43164C10.8643 9.19238 10.6797 9.00098 10.4336 9.00098ZM10.4336 11.2979H5.42969C5.16992 11.2979 4.98535 11.4893 4.98535 11.7354C4.98535 11.9746 5.16992 12.1592 5.42969 12.1592H10.4336C10.6797 12.1592 10.8643 11.9746 10.8643 11.7354C10.8643 11.4893 10.6797 11.2979 10.4336 11.2979Z" />
-            </svg>
-            {note.title}
-          </Link>
+          <div key = {note.id}
+            className="flex items-center justify-start py-2 px-4 mb-2 text-sm font-semibold text-gray-700 rounded-md hover:bg-gray-100">
+            <Link
+              href={`/note/${note.id}`}
+              className="flex items-center py-2 px-4 pl-0 mb-2 text-sm font-semibold text-gray-700 rounded-md cursor-pointer hover:bg-gray-100"
+            >
+              <svg viewBox="0 0 20 20" className="w-5 h-5 mr-3 text-gray-600">
+                <path d="M4.35645 15.4678H11.6367C13.0996 15.4678 13.8584 14.6953 13.8584 13.2256V7.02539C13.8584 6.0752 13.7354 5.6377 13.1406 5.03613L9.55176 1.38574C8.97754 0.804688 8.50586 0.667969 7.65137 0.667969H4.35645C2.89355 0.667969 2.13477 1.44043 2.13477 2.91016V13.2256C2.13477 14.7021 2.89355 15.4678 4.35645 15.4678ZM4.46582 14.1279C3.80273 14.1279 3.47461 13.7793 3.47461 13.1436V2.99219C3.47461 2.36328 3.80273 2.00781 4.46582 2.00781H7.37793V5.75391C7.37793 6.73145 7.86328 7.20312 8.83398 7.20312H12.5186V13.1436C12.5186 13.7793 12.1836 14.1279 11.5205 14.1279H4.46582ZM8.95703 6.02734C8.67676 6.02734 8.56055 5.9043 8.56055 5.62402V2.19238L12.334 6.02734H8.95703ZM10.4336 9.00098H5.42969C5.16992 9.00098 4.98535 9.19238 4.98535 9.43164C4.98535 9.67773 5.16992 9.86914 5.42969 9.86914H10.4336C10.6797 9.86914 10.8643 9.67773 10.8643 9.43164C10.8643 9.19238 10.6797 9.00098 10.4336 9.00098ZM10.4336 11.2979H5.42969C5.16992 11.2979 4.98535 11.4893 4.98535 11.7354C4.98535 11.9746 5.16992 12.1592 5.42969 12.1592H10.4336C10.6797 12.1592 10.8643 11.9746 10.8643 11.7354C10.8643 11.4893 10.6797 11.2979 10.4336 11.2979Z" />
+              </svg>
+              {note.title}
+            </Link>
+            <button
+            onClick={() => handleDeleteNote(note.id)}
+            className="p-1 hover:bg-gray-200 rounded">
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+                className="w-5 h-5 text-red-500">
+                <path
+                  d="M6 6L18 18M6 18L18 6"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"/>
+              </svg>
+            </button>
+          </div>
         ))}
 
         {/* New Note Button */}

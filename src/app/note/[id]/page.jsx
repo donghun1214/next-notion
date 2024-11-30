@@ -27,7 +27,7 @@ export default function NotePage() {
 //Content 에 note state 전달
   return (
     <div className="flex">
-      { notes.length && <Sidebar notes={notes}/> }
+      { notes.length && <Sidebar notes={notes} setNotes={setNotes} /> }
       { note && <Content note={note} setNotes={setNotes} /> }
     </div>
   );
