@@ -121,3 +121,32 @@ export async function deleteNote(note_id) {
   }
 }
 
+export async function searchNotes(query) {
+  try {
+    const results = await db.note.findMany({
+      where: {
+        OR: [
+          {
+            title: {
+              contains: query
+            },
+          },
+          {
+            content: {
+              value: {
+                contains: query
+              },
+            },
+          },
+        ],
+      },
+      include: {
+        content: true, // content 필드도 결과에 포함
+      },
+    });
+    return results
+  } catch (error) {
+    console.error("Search failed:", error);
+    throw new Error("Failed to search notes.");
+  }
+}
