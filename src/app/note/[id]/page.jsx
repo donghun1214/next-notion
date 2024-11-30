@@ -2,6 +2,7 @@
 
 import Sidebar from '@/app/components/sidebar'; // 사이드바 컴포넌트
 import Content from '@/app/components/content'; // 콘텐츠 컴포넌트
+import Profile from '@/app/components/profile';
 import { useParams } from 'next/navigation';
 import { useState, useEffect} from 'react';
 import { currentNotes, searchNotes } from '@/action';
@@ -81,7 +82,9 @@ export default function NotePage() {
             </div>
           </div>
         )}
-      {mode !== "searching" && note && <Content note={note} setNotes={setNotes} /> }
+      {mode === 'profile' && <Profile />}
+      {mode !== 'profile' && mode !== "searching"
+      && note && <Content note={note} setNotes={setNotes} /> }
     </div>
   );
 }

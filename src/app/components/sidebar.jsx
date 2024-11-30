@@ -41,7 +41,9 @@ export default function Sidebar({ notes, setNotes, setMode}) {
     <div className="bg-gray-50 w-64 min-h-screen p-3 font-sans shadow-md">
       {/* Profile Container */}
       <div className="flex items-center justify-between mb-6">
-        <div className="flex items-center gap-3">
+        <div 
+        onClick={() => setMode('profile')}
+        className="flex items-center gap-3">
           <Image
             src="/profile.jpg"
             alt="profile"

@@ -1,5 +1,4 @@
 'use server';
-
 import db from '@/db';
 
 export async function createNote( count ) {
@@ -148,5 +147,20 @@ export async function searchNotes(query) {
   } catch (error) {
     console.error("Search failed:", error);
     throw new Error("Failed to search notes.");
+  }
+}
+
+// 프로필 이미지 변경
+export async function updateProfileImage(userId, image) {
+  try {
+    const updatedUser = await db.user.update({
+      where: { id: parseInt(userId, 10) }, // userId에 해당하는 사용자 찾기
+      data: { profileImage: image }, // profileImage 업데이트
+    });
+
+    return updatedUser;
+  } catch (error) {
+    console.error('Failed to update profile image:', error);
+    throw new Error('Failed to update profile image');
   }
 }
