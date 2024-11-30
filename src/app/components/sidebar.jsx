@@ -9,7 +9,7 @@ export default function Sidebar({ notes }) {
   const handleCreateNote = async () => {
     try {
       const newNote = await createNote(notes.length);
-      location.reload()
+      location.reload()  //새로고침
     } catch (error) {
       console.error(error);
       alert('Failed to create a note.');

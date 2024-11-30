@@ -26,3 +26,9 @@ model Content {
   value      String
   note       Note?     @relation 
 }
+
+model User {
+  id        Int      @id @default(autoincrement())
+  username  String   @unique
+  password  String
+}

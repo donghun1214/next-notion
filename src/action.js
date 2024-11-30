@@ -65,3 +65,33 @@ export async function currentNotes(){
   })
   return notes
 }
+
+// 회원가입 함수
+export async function registerUser(username, password) {
+  try {
+    const user = await db.user.create({
+      data: { username, password },
+    });
+    return user;
+  } catch (error) {
+    console.error("Registration failed:", error);
+    throw new Error("Failed to register user.");
+  }
+}
+
+// 로그인 함수
+export async function loginUser(username, password) {
+  try {
+    const user = await db.user.findUnique({
+      where: { username },
+    });
+
+    if (!user || user.password !== password) {
+      throw new Error("Invalid credentials");
+    }
+    return user;
+  } catch (error) {
+    console.error("Login failed:", error);
+    throw new Error("Failed to login.");
+  }
+}
