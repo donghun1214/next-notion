@@ -33,7 +33,7 @@ export default function SearchPage() {
       <Sidebar notes={notes} setNotes={setNotes} />
 
       {/* Content Area */}
-      <div className="flex-1 p-4">
+      <div className="flex-1 flex flex-col items-center justify-start p-4">
         <h1 className="text-2xl font-bold mb-4">Search Notes</h1>
         <div className="mb-4">
           <input
