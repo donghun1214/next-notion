@@ -6,9 +6,11 @@ import Profile from '@/app/components/profile';
 import { useParams } from 'next/navigation';
 import { useState, useEffect} from 'react';
 import { currentNotes, searchNotes } from '@/action';
+import { useSession } from 'next-auth/react';
 
 export default function NotePage() {
   const {id} = useParams()
+  const { data: session, status} = useSession();
   const [notes, setNotes] = useState([]);
   const [note, setNote] = useState() //initalize state
 
@@ -19,7 +21,7 @@ export default function NotePage() {
   useEffect(() => {
     async function fetchNotes() {
       try {
-        const data = await currentNotes();  //DB 에 있는 현재 Note 들 다 들고오기
+        const data = await currentNotes(session.user.id);  //DB 에 있는 현재 Note 들 다 들고오기
         setNotes(data);
         setNote(data.find(n => n.id === parseInt(id)))
       } catch (error) {
@@ -27,7 +29,8 @@ export default function NotePage() {
       }
     }
     fetchNotes();
-  }, []); 
+  }, [status, session, id]); 
+
   const handleSearch = async () => {
     try {
       const s_notes = await searchNotes(query);

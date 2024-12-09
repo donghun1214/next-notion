@@ -19,6 +19,8 @@ model Note {
   createdAt  DateTime  @default(now())
   content    Content?  @relation(fields: [contentId], references: [id]) 
   contentId  Int?      @unique
+  userId     Int
+  user       User     @relation(fields: [userId], references: [id])
 }
 
 model Content {
@@ -32,4 +34,5 @@ model User {
   username  String   @unique
   password  String
   profileImage String?
+  notes   Note[]
 }

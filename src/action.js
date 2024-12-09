@@ -1,7 +1,7 @@
 'use server';
 import db from '@/db';
 
-export async function createNote( count ) {
+export async function createNote( userId, count ) {
     try {
       const content = await db.content.create({
         data: {
@@ -11,7 +11,8 @@ export async function createNote( count ) {
       const newNote = await db.note.create({
         data: {
           title: `Untitled ${count +1}`,
-          contentId: content.id
+          contentId: content.id,
+          userId: parseInt(userId, 10)
         }
       })
 
@@ -56,12 +57,13 @@ export async function findOneNote(note_id){
   return note;
 }
 
-export async function currentNotes(){
+export async function currentNotes(userId){
   const notes = await db.note.findMany({
+    where: { userId: parseInt(userId, 10) },
     include: {
-      content: true
-    }
-  })
+      content: true,
+    },
+  });
   return notes
 }
 

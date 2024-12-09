@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { registerUser, loginUser } from "@/action";
+import { signIn } from "next-auth/react";
 
 export default function LoginPage() {
   const [username, setUsername] = useState("");
@@ -25,14 +26,17 @@ export default function LoginPage() {
   };
 
   const handleLogin = async () => {
-    try {
-      const res = await loginUser(username, password);
-      alert(`Welcome back, ${res.username}!`);
-      // 로그인 성공 후 노트 페이지로 이동
+    const res = await signIn("credentials", {
+      redirect: false,
+      username,
+      password
+    });
+
+    if (res.ok) {
+      alert("Login successful!");
       window.location.href = "/note/1";
-    } catch (error) {
-      console.error("Login error:", error);
-      alert("Invalid username or password.");
+    } else {
+      alert("Login failed. Please try again.");
     }
   };
 

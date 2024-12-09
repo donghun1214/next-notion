@@ -29,7 +29,7 @@ export default function Sidebar({ notes, setNotes, setMode}) {
 
   const handleCreateNote = async () => {
     try {
-      const newNote = await createNote(notes.length);
+      const newNote = await createNote(session.user.id, notes.length);
       setNotes((prevNotes) => [...prevNotes, newNote]);
     } catch (error) {
       console.error(error);
