@@ -122,10 +122,11 @@ export async function deleteNote(note_id) {
   }
 }
 
-export async function searchNotes(query) {
+export async function searchNotes(userId, query) {
   try {
     const results = await db.note.findMany({
       where: {
+        userId: parseInt(userId, 10),
         OR: [
           {
             title: {
@@ -145,7 +146,7 @@ export async function searchNotes(query) {
         content: true, // content 필드도 결과에 포함
       },
     });
-    return results
+    return results;
   } catch (error) {
     console.error("Search failed:", error);
     throw new Error("Failed to search notes.");

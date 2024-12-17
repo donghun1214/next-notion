@@ -34,8 +34,12 @@ export default function NotePage() {
   }, [status, session, id]); 
 
   const handleSearch = async () => {
+    if(!session){
+      console.log("no session~~")
+      return;
+    }
     try {
-      const s_notes = await searchNotes(query);
+      const s_notes = await searchNotes(session.user.id, query);
       setResults(s_notes);
     } catch (error) {
       console.error('Search failed:', error);
