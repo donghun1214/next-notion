@@ -20,12 +20,14 @@ export default function NotePage() {
 
   useEffect(() => {
     async function fetchNotes() {
-      try {
-        const data = await currentNotes(session.user.id);  //DB 에 있는 현재 Note 들 다 들고오기
-        setNotes(data);
-        setNote(data.find(n => n.id === parseInt(id)))
-      } catch (error) {
-        console.error("Failed to fetch notes:", error);
+      if (status === "authenticated" && session) {
+        try {
+          const data = await currentNotes(session.user.id);  //DB 에 있는 현재 Note 들 다 들고오기
+          setNotes(data);
+          setNote(data.find(n => n.id === parseInt(id)));
+        } catch (error) {
+          console.error("Failed to fetch notes:", error);
+        }
       }
     }
     fetchNotes();
@@ -46,7 +48,7 @@ export default function NotePage() {
 //Content 에 note state 전달
   return (
     <div className="flex">
-      { notes.length && <Sidebar notes={notes} setNotes={setNotes} setMode={setMode} /> }
+      { notes.length && <Sidebar notes={notes} setNotes={setNotes} setMode={setMode} session = {session} /> }
       {mode === "searching" && (
           <div className = "flex-1 p-4">
             <h1 className="text-2xl font-bold mb-4">Search Notes</h1>

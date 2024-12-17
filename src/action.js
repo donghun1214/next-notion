@@ -5,7 +5,7 @@ export async function createNote( userId, count ) {
     try {
       const content = await db.content.create({
         data: {
-          value: 'hello'
+          value: 'I love web programmig'
         }
       })
       const newNote = await db.note.create({

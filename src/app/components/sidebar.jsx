@@ -5,7 +5,7 @@ import Image from 'next/image';
 import { useState, useEffect } from 'react';
 import { createNote, deleteNote } from '@/action';
 
-export default function Sidebar({ notes, setNotes, setMode}) {
+export default function Sidebar({ notes, setNotes, setMode, session}) {
   const [currentNoteId, setCurrentNoteId] = useState(null);
 
   useEffect(() => {
