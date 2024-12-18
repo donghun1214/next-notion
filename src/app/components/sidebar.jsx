@@ -1,11 +1,13 @@
 'use client';
-
+import { CiStar } from "react-icons/ci";
 import Link from 'next/link';
 import Image from 'next/image';
 import { useState, useEffect } from 'react';
-import { createNote, deleteNote } from '@/action';
+import { useSession } from 'next-auth/react';
+import { createNote, deleteNote, toggleFavorite } from '@/action';
 
-export default function Sidebar({ notes, setNotes, setMode, session}) {
+export default function Sidebar({ notes, setNotes, setMode}) {
+  const { data: session } = useSession();
   const [currentNoteId, setCurrentNoteId] = useState(null);
 
   useEffect(() => {
@@ -26,6 +28,19 @@ export default function Sidebar({ notes, setNotes, setMode, session}) {
       alert("Failed to delete note.");
     }
   };
+
+  const handleToggleFavorite = async (id) => {
+    try {
+      const updatedNote = await toggleFavorite(id);
+      setNotes((prevNotes) =>
+        prevNotes.map((note) => (note.id === updatedNote.id ? updatedNote : note))
+      );
+    } catch (error) {
+      console.error('Failed to toggle favorite:', error);
+    }
+  };
+  const sortedNotes = [...notes].sort((a, b) => b.isFavorite - a.isFavorite);
+
 
   const handleCreateNote = async () => {
     try {
@@ -89,37 +104,46 @@ export default function Sidebar({ notes, setNotes, setMode, session}) {
       {/* Notes */}
       <div className="mt-8">
         <div className="px-4 text-xs font-semibold text-gray-500 mb-2 -ml-4">Private</div>
-        {notes.map((note) => (
-          <div key = {note.id}
-          className={`flex items-center justify-start py-2 px-4 mb-2 text-sm font-semibold rounded-md hover:bg-gray-100 ${
-            note.id.toString() === currentNoteId
-              ? 'bg-blue-100 text-blue-700' // Highlight style
-              : 'text-gray-700'
-          }`}
-        >
+        {sortedNotes.map((note) => (
+          <div
+            key={note.id}
+            className={`flex items-center justify-start py-2 px-4 mb-2 text-sm font-semibold rounded-md hover:bg-gray-100 ${
+              note.id.toString() === currentNoteId ? 'bg-blue-100 text-blue-700' : 'text-gray-700'
+            }`}
+          >
+            <button onClick={() => handleToggleFavorite(note.id)} className="mr-2">
+              {note.isFavorite ? (
+                <svg viewBox="0 0 20 20" className="w-5 h-5 text-yellow-500">
+                  <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.286 3.97a1 1 0 00.95.69h4.18c.969 0 1.371 1.24.588 1.81l-3.39 2.46a1 1 0 00-.364 1.118l1.286 3.97c.3.921-.755 1.688-1.54 1.118l-3.39-2.46a1 1 0 00-1.176 0l-3.39 2.46c-.784.57-1.84-.197-1.54-1.118l1.286-3.97a1 1 0 00-.364-1.118l-3.39-2.46c-.784-.57-.38-1.81.588-1.81h4.18a1 1 0 00.95-.69l1.286-3.97z" />
+                </svg>
+              ) : (
+                <CiStar className="w-5 h-5 text-gray-400 hover:text-yellow-500" />
+              )}
+            </button>
             <Link
               href={`/note/${note.id}`}
               className="flex items-center py-2 px-4 pl-0 mb-2 text-sm font-semibold text-gray-700 rounded-md cursor-pointer hover:bg-gray-100"
             >
-              <svg viewBox="0 0 20 20" className="w-5 h-5 mr-3 text-gray-600">
-                <path d="M4.35645 15.4678H11.6367C13.0996 15.4678 13.8584 14.6953 13.8584 13.2256V7.02539C13.8584 6.0752 13.7354 5.6377 13.1406 5.03613L9.55176 1.38574C8.97754 0.804688 8.50586 0.667969 7.65137 0.667969H4.35645C2.89355 0.667969 2.13477 1.44043 2.13477 2.91016V13.2256C2.13477 14.7021 2.89355 15.4678 4.35645 15.4678ZM4.46582 14.1279C3.80273 14.1279 3.47461 13.7793 3.47461 13.1436V2.99219C3.47461 2.36328 3.80273 2.00781 4.46582 2.00781H7.37793V5.75391C7.37793 6.73145 7.86328 7.20312 8.83398 7.20312H12.5186V13.1436C12.5186 13.7793 12.1836 14.1279 11.5205 14.1279H4.46582ZM8.95703 6.02734C8.67676 6.02734 8.56055 5.9043 8.56055 5.62402V2.19238L12.334 6.02734H8.95703ZM10.4336 9.00098H5.42969C5.16992 9.00098 4.98535 9.19238 4.98535 9.43164C4.98535 9.67773 5.16992 9.86914 5.42969 9.86914H10.4336C10.6797 9.86914 10.8643 9.67773 10.8643 9.43164C10.8643 9.19238 10.6797 9.00098 10.4336 9.00098ZM10.4336 11.2979H5.42969C5.16992 11.2979 4.98535 11.4893 4.98535 11.7354C4.98535 11.9746 5.16992 12.1592 5.42969 12.1592H10.4336C10.6797 12.1592 10.8643 11.9746 10.8643 11.7354C10.8643 11.4893 10.6797 11.2979 10.4336 11.2979Z" />
-              </svg>
               {note.title}
             </Link>
+            
             <button
-            onClick={() => handleDeleteNote(note.id)}
-            className="p-1 hover:bg-gray-200 rounded">
+              onClick={() => handleDeleteNote(note.id)}
+              className="p-1 hover:bg-gray-200 rounded"
+            >
               <svg
                 viewBox="0 0 24 24"
                 fill="none"
                 xmlns="http://www.w3.org/2000/svg"
-                className="w-5 h-5 text-red-500">
+                className="w-5 h-5 text-red-500"
+              >
                 <path
                   d="M6 6L18 18M6 18L18 6"
                   stroke="currentColor"
                   strokeWidth="2"
                   strokeLinecap="round"
-                  strokeLinejoin="round"/>
+                  strokeLinejoin="round"
+                />
               </svg>
             </button>
           </div>

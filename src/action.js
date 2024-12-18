@@ -211,3 +211,24 @@ export async function getComments(noteId) {
     throw new Error('Failed to fetch comments');
   }
 }
+
+// 즐겨찾기 상태 토글 함수
+export async function toggleFavorite(noteId) {
+  try {
+    const note = await db.note.findUnique({
+      where: { id: parseInt(noteId, 10) },
+    });
+
+    if (!note) throw new Error("Note not found");
+
+    const updatedNote = await db.note.update({
+      where: { id: parseInt(noteId, 10) },
+      data: { isFavorite: !note.isFavorite },
+    });
+
+    return updatedNote;
+  } catch (error) {
+    console.error('Failed to toggle favorite:', error);
+    throw new Error('Failed to toggle favorite');
+  }
+}

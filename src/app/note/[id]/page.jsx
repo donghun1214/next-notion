@@ -6,7 +6,7 @@ import Profile from '@/app/components/profile';
 import CommentSidebar from '@/app/components/CommentSidebar';
 import { useParams } from 'next/navigation';
 import { useState, useEffect} from 'react';
-import { currentNotes, searchNotes, getComments } from '@/action';
+import { currentNotes, searchNotes, getComments, toggleFavorite } from '@/action';
 import { useSession } from 'next-auth/react';
 
 export default function NotePage() {
@@ -36,14 +36,28 @@ export default function NotePage() {
         } catch (error) {
           console.error("Failed to fetch notes:", error);
         }
+      } else{
+        alert("no session")
       }
     }
     fetchNotes();
-  }, [status, session, id, isCommentSidebarOpen]); 
+  }, [status, session, id]); 
+
+  const handleToggleFavorite = async () => {
+    try {
+      const updatedNote = await toggleFavorite(id);
+      setNote(updatedNote);
+      setNotes((prevNotes) =>
+        prevNotes.map((n) => (n.id === updatedNote.id ? updatedNote : n))
+      );
+    } catch (error) {
+      console.error('Failed to toggle favorite:', error);
+    }
+  };
 
   const handleSearch = async () => {
     if(!session){
-      console.log("no session~~")
+      alert("no")
       return;
     }
     try {
@@ -84,16 +98,16 @@ export default function NotePage() {
             <div>
               {results.length > 0 ? (
                 <ul>
-                  {results.map((note) => (
-                    <li
-                      key={note.id}
-                      className="p-2 mb-2 border rounded hover:bg-gray-100 cursor-pointer"
-                    >
-                      <a href={`/note/${note.id}`} className="text-blue-600">
-                    {note.title}
-                      </a>
-                    </li>
-                  ))}
+                    {results.map((note) => (
+                      <li
+                        key={note.id}
+                        className="p-2 mb-2 border rounded hover:bg-gray-100 cursor-pointer"
+                      >
+                        <a href={`/note/${note.id}`} className="text-blue-600">
+                          {note.title}
+                        </a>
+                      </li>
+                    ))} 
                 </ul>
               ) : (
                 <p className="text-gray-500">No results found.</p>

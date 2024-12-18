@@ -21,6 +21,7 @@ model Note {
   contentId  Int?      @unique
   userId     Int
   user       User     @relation(fields: [userId], references: [id])
+  isFavorite Boolean @default(false)
 
   comments Comment[]
 }
