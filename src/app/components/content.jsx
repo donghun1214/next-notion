@@ -3,13 +3,14 @@
 import { useState } from 'react';
 import { updateTitle, updateContent } from '@/action';
 import { useParams } from 'next/navigation';
+import Mdxeditor from '@/app/components/MdxEditor';
 
 export default function Content({ note, setNotes }) {
   const { id } = useParams()
   const contentId = note.content.id
   // title 과 content 를 state 로 다루자.
   const [title, setTitle] = useState(note.title);
-  const [content, setContent] = useState(note?.content?.value);  
+  const [content, setContent] = useState(note?.content?.value ?? "");  
   
   // 제목 업데이트 : 즉시 서버 반영하도록
   const handleTitleChange = async (newTitle) => {
@@ -44,11 +45,13 @@ export default function Content({ note, setNotes }) {
         value={title}
         onChange={(e) => handleTitleChange(e.target.value)}
       />
-      <textarea
-        className="w-3/4 h-80 border border-gray-300 rounded-lg p-2 focus:outline-none focus:border-blue-300"
-        value={content}
-        onChange={(e) => handleContentChange(e.target.value)}
-      />
+      <div className="border border-gray-300 rounded-lg p-2 focus:outline-none focus:border-blue-300 mec">
+        <Mdxeditor
+          markdown={content}
+          onChange={handleContentChange}
+          id={contentId}
+        />
+      </div>
     </div>
   );
 }
