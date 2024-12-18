@@ -21,12 +21,14 @@ model Note {
   contentId  Int?      @unique
   userId     Int
   user       User     @relation(fields: [userId], references: [id])
+
+  comments Comment[]
 }
 
 model Content {
   id         Int       @id @default(autoincrement()) 
   value      String
-  note       Note?     @relation 
+  note       Note?     @relation
 }
 
 model User {
@@ -35,4 +37,15 @@ model User {
   password  String
   profileImage String?
   notes   Note[]
+  comments Comment[]
+}
+
+model Comment {
+  id        Int      @id @default(autoincrement())
+  content   String
+  createdAt DateTime @default(now())
+  userId    Int
+  noteId    Int
+  user      User     @relation(fields: [userId], references: [id])
+  note      Note     @relation(fields: [noteId], references: [id])
 }

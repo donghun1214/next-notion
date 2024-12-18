@@ -3,9 +3,10 @@
 import Sidebar from '@/app/components/sidebar'; // 사이드바 컴포넌트
 import Content from '@/app/components/content'; // 콘텐츠 컴포넌트
 import Profile from '@/app/components/profile';
+import CommentSidebar from '@/app/components/CommentSidebar';
 import { useParams } from 'next/navigation';
 import { useState, useEffect} from 'react';
-import { currentNotes, searchNotes } from '@/action';
+import { currentNotes, searchNotes, getComments } from '@/action';
 import { useSession } from 'next-auth/react';
 
 export default function NotePage() {
@@ -17,6 +18,7 @@ export default function NotePage() {
   const [mode, setMode] = useState(""); // 모드 상태: "searching"
   const [query, setQuery] = useState(''); // 검색어 상태
   const [results, setResults] = useState([]); // 검색 결과 상태
+  const [isCommentSidebarOpen, setIsCommentSidebarOpen] = useState(false);
 
   useEffect(() => {
     async function fetchNotes() {
@@ -25,13 +27,19 @@ export default function NotePage() {
           const data = await currentNotes(session.user.id);  //DB 에 있는 현재 Note 들 다 들고오기
           setNotes(data);
           setNote(data.find(n => n.id === parseInt(id)));
+
+          // 댓글이 있는지 확인하고, 댓글이 있으면 CommentSidebar를 엽니다.
+          const comments = await getComments(id);
+          if (comments.length > 0) {
+            setIsCommentSidebarOpen(true);
+          }
         } catch (error) {
           console.error("Failed to fetch notes:", error);
         }
       }
     }
     fetchNotes();
-  }, [status, session, id]); 
+  }, [status, session, id, isCommentSidebarOpen]); 
 
   const handleSearch = async () => {
     if(!session){
@@ -46,7 +54,9 @@ export default function NotePage() {
       alert('Failed to search notes.');
     }
   };
-  
+  const handleToggleCommentSidebar = () => {
+    setIsCommentSidebarOpen(!isCommentSidebarOpen);
+  };
   //처음 렌더링될 때 실행된다.
 //sidebar 에 notes state 전달
 //Content 에 note state 전달
@@ -92,8 +102,17 @@ export default function NotePage() {
           </div>
         )}
       {mode === 'profile' && <Profile />}
-      {mode !== 'profile' && mode !== "searching"
-      && note && <Content note={note} setNotes={setNotes} /> }
+      {mode !== 'profile' && mode !== 'searching' && note && (
+        <div className="flex-1">
+          <Content note={note} setNotes={setNotes} />
+        </div>
+      )}
+      <div className="relative">
+        <button onClick={handleToggleCommentSidebar} className="absolute top-0 right-0 mt-4 p-2 bg-blue-500 text-white rounded">
+          {isCommentSidebarOpen ? 'Hide Comments' : 'Show Comments'}
+        </button>
+        <CommentSidebar noteId={id} isOpen={isCommentSidebarOpen} onClose={handleToggleCommentSidebar} />
+      </div>
     </div>
   );
 }

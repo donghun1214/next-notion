@@ -167,3 +167,47 @@ export async function updateProfileImage(userId, image) {
     throw new Error('Failed to update profile image');
   }
 }
+
+// 댓글 생성 함수
+export async function createComment(noteId, userId, content) {
+  try {
+    const comment = await db.comment.create({
+      data: {
+        content,
+        userId: parseInt(userId, 10),
+        noteId: parseInt(noteId, 10),
+      },
+    });
+    return comment;
+  } catch (error) {
+    console.error('Failed to create comment:', error);
+    throw new Error('Failed to create comment');
+  }
+}
+
+// 댓글 삭제 함수
+export async function deleteComment(commentId) {
+  try {
+    await db.comment.delete({
+      where: { id: parseInt(commentId, 10) },
+    });
+    return { success: true };
+  } catch (error) {
+    console.error('Failed to delete comment:', error);
+    throw new Error('Failed to delete comment');
+  }
+}
+
+// 댓글 가져오기 함수
+export async function getComments(noteId) {
+  try {
+    const comments = await db.comment.findMany({
+      where: { noteId: parseInt(noteId, 10) },
+      include: { user: true },
+    });
+    return comments;
+  } catch (error) {
+    console.error('Failed to fetch comments:', error);
+    throw new Error('Failed to fetch comments');
+  }
+}

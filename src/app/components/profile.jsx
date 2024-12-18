@@ -1,12 +1,29 @@
 'use client';
 
-import { useState } from 'react';
-import { updateProfileImage } from '@/action';
+import { useState, useEffect } from 'react';
+import { useSession } from 'next-auth/react';
+import { updateProfileImage, getProfileImage } from '@/action';
 
 export default function Profile() {
+  const { data: session } = useSession();
   const [selectedFile, setSelectedFile] = useState(null);
-  const [profileImage, setProfileImage] = useState('/profile.jpg');
-  const [userId] = useState(1); // 예제 사용자 ID
+  const [profileImage, setProfileImage] = useState(session?.user?.profileImage || '/profile.jpg');
+  useEffect(() => {
+    if (session && session.user) {
+      // 프로필 이미지를 데이터베이스에서 가져오기
+      const fetchProfileImage = async () => {
+        try {
+          const image = await getProfileImage(session.user.id);
+          if (image) {
+            setProfileImage(`data:image/jpeg;base64,${image}`);
+          }
+        } catch (error) {
+          console.error('Failed to fetch profile image:', error);
+        }
+      };
+      fetchProfileImage();
+    }
+  }, [session]);
 
   const handleFileChange = (e) => {
     const file = e.target.files[0];
@@ -21,14 +38,26 @@ export default function Profile() {
   };
 
   const handleUpload = async () => {
+    alert(profileImage);
     if (!selectedFile) {
       alert('Please select an image to upload.');
       return;
     }
+    if (!session || !session.user) {
+      alert('No session found. Please log in.');
+      return;
+    }
 
     try {
-      await updateProfileImage(userId, profileImage);
-      alert('Profile image updated successfully!');
+      const reader = new FileReader();
+      reader.onloadend = async () => {
+        const base64String = reader.result.replace("data:", "").replace(/^.+,/, "");
+        await updateProfileImage(session.user.id, base64String);
+        setProfileImage(reader.result); // 프로필 이미지 상태 업데이트
+        await update({ ...session, user: { ...session.user, profileImage: reader.result } }); // 세션 업데이트
+        alert('Profile image updated successfully!');
+      };
+      reader.readAsDataURL(selectedFile);
     } catch (error) {
       console.error('Error updating profile image:', error);
       alert('Failed to update profile image.');
