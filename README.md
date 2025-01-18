@@ -1,8 +1,8 @@
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
 
-## Getting Started
+## How to run (실행 방법)
 
-First, install node_modules 
+1. node_modules 설치 
 ```bash
 npm install
 # or
@@ -11,14 +11,19 @@ pnpm install
 yarn install
 ```
 
-Second, run the development server:
-
+2. 개발 서버 실행 !
 ```bash
 npm run dev
 # or
 yarn dev
 # or
 pnpm dev
+```
+
+3. 시드 실행
+
+```bash
+URL 에 localhost:3000/api/seed 입력
 ```
 
 
